@@ -1,4 +1,4 @@
-pageextension 84201 DYM_CustomerCard extends "Customer Card"
+pageextension 70100 DYM_CustomerCard extends "Customer Card"
 {
     layout
     {
@@ -25,5 +25,6 @@ pageextension 84201 DYM_CustomerCard extends "Customer Card"
             }
         }
     }
-    var DeliverPersonCode: Text[100];
+    var
+        DeliverPersonCode: Text[100];
 }

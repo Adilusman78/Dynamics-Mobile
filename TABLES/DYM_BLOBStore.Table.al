@@ -1,4 +1,4 @@
-table 84010 DYM_BLOBStore
+table 70100 DYM_BLOBStore
 {
     Caption = 'BLOB Store';
     DataClassification = CustomerContent;
@@ -21,7 +21,7 @@ table 84010 DYM_BLOBStore
         {
             DataClassification = SystemMetadata;
         }
-        field(4; Status;enum DYM_BLOBStoreEntryStatus)
+        field(4; Status; enum DYM_BLOBStoreEntryStatus)
         {
             DataClassification = SystemMetadata;
         }
@@ -60,27 +60,32 @@ table 84010 DYM_BLOBStore
         {
         }
     }
-    var Text001: Label 'BLOBStore Entry does not contain data.';
+    var
+        Text001: Label 'BLOBStore Entry does not contain data.';
+
     procedure findByIdentifier(_DeviceSetupCode: Code[100]; _Identifier: Text)
     var
         BLOBStoreMgt: Codeunit DYM_BLOBStoreManagement;
     begin
         Get(BLOBStoreMgt.findBLOBStoreEntry(_DeviceSetupCode, _Identifier));
     end;
-    procedure existsByIdentifier(_DeviceSetupCode: Code[100]; _Identifier: Text): boolean var
+
+    procedure existsByIdentifier(_DeviceSetupCode: Code[100]; _Identifier: Text): boolean
+    var
         BLOBStoreMgt: Codeunit DYM_BLOBStoreManagement;
     begin
         exit(Get(BLOBStoreMgt.findBLOBStoreEntry(_DeviceSetupCode, _Identifier)));
     end;
+
     procedure Download()
     var
         inS: InStream;
         tempFilename: Text;
     begin
         CalcFields(Content);
-        if(not Content.HasValue)then error(Text001);
+        if (not Content.HasValue) then error(Text001);
         Content.CreateInStream(inS, TextEncoding::UTF8);
-        tempFilename:=CreateGuid();
+        tempFilename := CreateGuid();
         DownloadFromStream(inS, 'Export', '', 'All Files (*.*)|*.*', tempfilename);
     end;
 }

@@ -1,4 +1,4 @@
-page 84030 DYM_AssistedSetupWizard
+page 70100 DYM_AssistedSetupWizard
 {
     Caption = 'Dynamics Mobile Assisted Setup Wizard';
     PageType = NavigatePage;
@@ -220,27 +220,29 @@ page 84030 DYM_AssistedSetupWizard
             }
         }
     }
-    var SettingsMgt: Codeunit DYM_SettingsManagement;
-    ConstMgt: Codeunit DYM_ConstManagement;
-    AssistedSetup: Codeunit "Guided Experience";
-    MediaResourceNotCompleted, MediaResourceCompleted: Record "Media Resources";
-    WizardStep: Integer;
-    TestActionEnabled, FinishActionEnabled: Boolean;
-    BannersAvailable, TestSuccessful, vsCompletedBanner: Boolean;
-    EI_EnvType, EI_EnvName, EI_AzureTenantId, EI_ODataPort, EI_CurrentCompanyName: Text;
-    EI_IsSaas, EI_IsProduction, EI_AzureADSetup: Boolean;
-    F_AppArea: Text;
-    F_xAPIKey: Text;
-    ConfirmationHeaderMsg: Label 'You are about to save the following settings:\';
-    ChangeSettingSubMsg: Label '\Change [%1]\------------------------------\[%2]\--->\[%3]\';
-    ConfirmationFooterMsg: Label '\Do you want to continue?';
-    NoChangeConfirmationMsg: Label 'You have made no changes to the settings. Do you want to continue?';
-    ConnectionSuccessMsg: Label 'Connection successfull.';
-    ConnectionFailedMsg: Label 'Connection failed:\%1';
-    VideoURLLabel: Label 'Watch how to configure your Dynamics Mobile Portal account';
-    DocURLLabel: Label 'Learn more about Dynamics Mobile configuration';
-    EnvType_SaaS: Label 'SaaS';
-    EnvType_OnPrem: Label 'On-Prem';
+    var
+        SettingsMgt: Codeunit DYM_SettingsManagement;
+        ConstMgt: Codeunit DYM_ConstManagement;
+        AssistedSetup: Codeunit "Guided Experience";
+        MediaResourceNotCompleted, MediaResourceCompleted : Record "Media Resources";
+        WizardStep: Integer;
+        TestActionEnabled, FinishActionEnabled : Boolean;
+        BannersAvailable, TestSuccessful, vsCompletedBanner : Boolean;
+        EI_EnvType, EI_EnvName, EI_AzureTenantId, EI_ODataPort, EI_CurrentCompanyName : Text;
+        EI_IsSaas, EI_IsProduction, EI_AzureADSetup : Boolean;
+        F_AppArea: Text;
+        F_xAPIKey: Text;
+        ConfirmationHeaderMsg: Label 'You are about to save the following settings:\';
+        ChangeSettingSubMsg: Label '\Change [%1]\------------------------------\[%2]\--->\[%3]\';
+        ConfirmationFooterMsg: Label '\Do you want to continue?';
+        NoChangeConfirmationMsg: Label 'You have made no changes to the settings. Do you want to continue?';
+        ConnectionSuccessMsg: Label 'Connection successfull.';
+        ConnectionFailedMsg: Label 'Connection failed:\%1';
+        VideoURLLabel: Label 'Watch how to configure your Dynamics Mobile Portal account';
+        DocURLLabel: Label 'Learn more about Dynamics Mobile configuration';
+        EnvType_SaaS: Label 'SaaS';
+        EnvType_OnPrem: Label 'On-Prem';
+
     trigger OnOpenPage()
     var
         EnvInfo: Codeunit "Environment Information";
@@ -250,56 +252,67 @@ page 84030 DYM_AssistedSetupWizard
         ServerSetting: Codeunit "Server Setting";
     begin
         LoadTopBanner();
-        F_AppArea:=SettingsMgt.GetGlobalSetting(ConstMgt.CLD_AppArea());
-        F_xAPIKey:=SettingsMgt.GetGlobalSetting(ConstMgt.CLD_xAPIKey());
-        EI_IsSaas:=EnvInfo.IsSaaSInfrastructure();
+        F_AppArea := SettingsMgt.GetGlobalSetting(ConstMgt.CLD_AppArea());
+        F_xAPIKey := SettingsMgt.GetGlobalSetting(ConstMgt.CLD_xAPIKey());
+        EI_IsSaas := EnvInfo.IsSaaSInfrastructure();
         Clear(EI_EnvType);
-        If EI_IsSaas then EI_EnvType:=EnvType_SaaS
+        If EI_IsSaas then
+            EI_EnvType := EnvType_SaaS
         else
-            EI_EnvType:=EnvType_OnPrem;
-        if(EI_IsSaas)then begin
+            EI_EnvType := EnvType_OnPrem;
+        if (EI_IsSaas) then begin
             Clear(EI_IsProduction);
-            EI_IsProduction:=EnvInfo.IsProduction();
+            EI_IsProduction := EnvInfo.IsProduction();
             Clear(EI_EnvName);
-            EI_EnvName:=EnvInfo.GetEnvironmentName();
+            EI_EnvName := EnvInfo.GetEnvironmentName();
         end;
         clear(EI_AzureADSetup);
-        EI_AzureADSetup:=AzureADMgt.IsAzureADAppSetupDone();
+        EI_AzureADSetup := AzureADMgt.IsAzureADAppSetupDone();
         Clear(EI_AzureTenantId);
-        if(EI_AzureADSetup)then EI_AzureTenantId:=AzureInfo.GetAadTenantId();
+        if (EI_AzureADSetup) then EI_AzureTenantId := AzureInfo.GetAadTenantId();
         Clear(EI_ODataPort);
-        EI_ODataPort:=GetUrl(ClientType::Api);
+        EI_ODataPort := GetUrl(ClientType::Api);
         Clear(EI_CurrentCompanyName);
-        EI_CurrentCompanyName:=CompanyName();
+        EI_CurrentCompanyName := CompanyName();
     end;
+
     local procedure NextStep(Back: Boolean)
     begin
-        case Back of true: begin
-            WizardStep:=WizardStep - 1;
-            clear(TestSuccessful);
+        case Back of
+            true:
+                begin
+                    WizardStep := WizardStep - 1;
+                    clear(TestSuccessful);
+                end;
+            false:
+                WizardStep := WizardStep + 1;
         end;
-        false: WizardStep:=WizardStep + 1;
-        end;
-        TestActionEnabled:=((WizardStep = 3) and (F_AppArea <> '') and (F_xAPIKey <> ''));
-    //FinishActionEnabled := ((WizardStep = 2) and (TestSuccessful));
+        TestActionEnabled := ((WizardStep = 3) and (F_AppArea <> '') and (F_xAPIKey <> ''));
+        //FinishActionEnabled := ((WizardStep = 2) and (TestSuccessful));
     end;
-    local procedure TestAction(): Boolean var
+
+    local procedure TestAction(): Boolean
+    var
         CloudMgt: Codeunit DYM_CloudManagement;
         ResultMsg: Text;
     begin
         Clear(ResultMsg);
-        case CloudMgt.testConnection(F_AppArea, F_xAPIKey, ResultMsg)of true: begin
-            Message(ConnectionSuccessMsg);
-            TestSuccessful:=true;
-            exit(true);
-        end;
-        false: begin
-            Message(ConnectionFailedMsg, ResultMsg);
-            TestSuccessful:=false;
-            exit(false);
-        end;
+        case CloudMgt.testConnection(F_AppArea, F_xAPIKey, ResultMsg) of
+            true:
+                begin
+                    Message(ConnectionSuccessMsg);
+                    TestSuccessful := true;
+                    exit(true);
+                end;
+            false:
+                begin
+                    Message(ConnectionFailedMsg, ResultMsg);
+                    TestSuccessful := false;
+                    exit(false);
+                end;
         end;
     end;
+
     local procedure FinishAction()
     var
         ConfirmationMessage: Text;
@@ -307,25 +320,26 @@ page 84030 DYM_AssistedSetupWizard
         UpdatexAPIKey: Boolean;
     begin
         Clear(ConfirmationMessage);
-        UpdateAppArea:=((F_AppArea <> SettingsMgt.GetGlobalSetting(ConstMgt.CLD_AppArea())) and ((F_AppArea <> '')));
-        UpdatexAPIKey:=((F_xAPIKey <> SettingsMgt.GetGlobalSetting(ConstMgt.CLD_xAPIKey())) and ((F_xAPIKey <> '')));
-        if(UpdateAppArea or UpdatexAPIKey)then begin
-            ConfirmationMessage:=ConfirmationMessage + ConfirmationHeaderMsg;
-            if(UpdateAppArea)then ConfirmationMessage:=ConfirmationMessage + StrSubstNo(ChangeSettingSubMsg, 'App Area', SettingsMgt.GetGlobalSetting(ConstMgt.CLD_AppArea()), F_AppArea);
-            if(UpdatexAPIKey)then ConfirmationMessage:=ConfirmationMessage + StrSubstNo(ChangeSettingSubMsg, 'xAPI Key', SettingsMgt.GetGlobalSetting(ConstMgt.CLD_xAPIKey()), F_xAPIKey);
-            ConfirmationMessage:=ConfirmationMessage + ConfirmationFooterMsg;
+        UpdateAppArea := ((F_AppArea <> SettingsMgt.GetGlobalSetting(ConstMgt.CLD_AppArea())) and ((F_AppArea <> '')));
+        UpdatexAPIKey := ((F_xAPIKey <> SettingsMgt.GetGlobalSetting(ConstMgt.CLD_xAPIKey())) and ((F_xAPIKey <> '')));
+        if (UpdateAppArea or UpdatexAPIKey) then begin
+            ConfirmationMessage := ConfirmationMessage + ConfirmationHeaderMsg;
+            if (UpdateAppArea) then ConfirmationMessage := ConfirmationMessage + StrSubstNo(ChangeSettingSubMsg, 'App Area', SettingsMgt.GetGlobalSetting(ConstMgt.CLD_AppArea()), F_AppArea);
+            if (UpdatexAPIKey) then ConfirmationMessage := ConfirmationMessage + StrSubstNo(ChangeSettingSubMsg, 'xAPI Key', SettingsMgt.GetGlobalSetting(ConstMgt.CLD_xAPIKey()), F_xAPIKey);
+            ConfirmationMessage := ConfirmationMessage + ConfirmationFooterMsg;
         end
         else
-            ConfirmationMessage:=NoChangeConfirmationMsg;
-        if not Confirm(ConfirmationMessage, false)then exit;
+            ConfirmationMessage := NoChangeConfirmationMsg;
+        if not Confirm(ConfirmationMessage, false) then exit;
         if UpdateAppArea then SettingsMgt.SetGlobalSetting(ConstMgt.CLD_AppArea(), F_AppArea);
         if UpdatexAPIKey then SettingsMgt.SetGlobalSetting(ConstMgt.CLD_xAPIKey(), F_xAPIKey);
         AssistedSetup.CompleteAssistedSetup(ObjectType::Page, Page::DYM_AssistedSetupWizard);
         CurrPage.Close();
     end;
+
     local procedure LoadTopBanner()
     begin
-        if MediaResourceNotCompleted.Get('ASSISTEDSETUP-NOTEXT-400PX.PNG') and (CurrentClientType() = ClientType::Web)then BannersAvailable:=MediaResourceNotCompleted."Media Reference".HasValue();
-        if MediaResourceCompleted.Get('ASSISTEDSETUPDONE-NOTEXT-400px.PNG') and (CurrentClientType() = ClientType::Web)then BannersAvailable:=MediaResourceCompleted."Media Reference".HasValue();
+        if MediaResourceNotCompleted.Get('ASSISTEDSETUP-NOTEXT-400PX.PNG') and (CurrentClientType() = ClientType::Web) then BannersAvailable := MediaResourceNotCompleted."Media Reference".HasValue();
+        if MediaResourceCompleted.Get('ASSISTEDSETUPDONE-NOTEXT-400px.PNG') and (CurrentClientType() = ClientType::Web) then BannersAvailable := MediaResourceCompleted."Media Reference".HasValue();
     end;
 }

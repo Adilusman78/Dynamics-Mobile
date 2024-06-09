@@ -1,4 +1,4 @@
-query 84111 DYM_DAO_BS_Bin
+query 70100 DYM_DAO_BS_Bin
 {
     QueryType = API;
     APIPublisher = 'DynamicsMobile';
@@ -9,29 +9,29 @@ query 84111 DYM_DAO_BS_Bin
 
     elements
     {
-    dataitem(Bin;
-    Bin)
-    {
-    column("code";
-    "Code")
-    {
-    }
-    column(zoneCode;
-    "Zone Code")
-    {
-    }
-    column(locationCode;
-    "Location Code")
-    {
-    }
-    column(description;
-    Description)
-    {
-    }
-    column(blockMovement;
-    "Block Movement")
-    {
-    }
-    }
+        dataitem(Bin;
+        Bin)
+        {
+            column("code";
+            "Code")
+            {
+            }
+            column(zoneCode;
+            "Zone Code")
+            {
+            }
+            column(locationCode;
+            "Location Code")
+            {
+            }
+            column(description;
+            Description)
+            {
+            }
+            column(blockMovement;
+            "Block Movement")
+            {
+            }
+        }
     }
 }
